@@ -44,3 +44,9 @@ mybatis-plus:
     cache-enabled: false
     call-setters-on-nulls: true
     jdbc-type-for-null: 'null'
+
+im:
+  - server:
+      port: 21000
+  - webSocketServer:
+      port: 22000

@@ -33,7 +33,7 @@ import javax.annotation.PreDestroy;
 //@Component
 public class ImServer {
 
-    @Value("${IM.server.port}")
+    @Value("${im.server.port}")
     private int port;
 
     private ProtobufDecoder decoder = new ProtobufDecoder(MessageProto.Model.getDefaultInstance());
@@ -51,7 +51,7 @@ public class ImServer {
 
 
     public void start() throws Exception {
-        log.info("start qiqiim server ...");
+        log.info("start im server ...");
         ServerBootstrap bootstrap = new ServerBootstrap();
         bootstrap.group(workerGroup, bossGroup);
         bootstrap.channel(NioServerSocketChannel.class);
@@ -70,7 +70,7 @@ public class ImServer {
         // 可选参数
         bootstrap.childOption(ChannelOption.TCP_NODELAY, true);
         // 绑定接口，同步等待成功
-        log.info("start qiqiim server at port[{}].", port);
+        log.info("start im server at port[{}].", port);
         ChannelFuture future = bootstrap.bind(port).sync();
         channel = future.channel();
         future.addListener(i -> {
