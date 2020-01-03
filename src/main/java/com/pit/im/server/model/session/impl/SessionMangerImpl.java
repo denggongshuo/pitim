@@ -155,7 +155,7 @@ public class SessionMangerImpl implements SessionManger {
                 log.info("session " + sessionId + " have been closed!");
             }
         }
-        session = setSessionContent(ctx,wrapper,sessionId);
+        session = setSessionContent(ctx, wrapper, sessionId);
         addSession(session);
         return session;
     }
@@ -164,27 +164,27 @@ public class SessionMangerImpl implements SessionManger {
     public Session createSession(ScriptSession scriptSession, String sessionid) {
         Session dwrsession = new Session(scriptSession);
         dwrsession.setAccount(sessionid);
-        dwrsession.setPlatform((String)scriptSession.getAttribute(ImConstants.DWRConfig.BROWSER));
-        dwrsession.setPlatformVersion((String)scriptSession.getAttribute(ImConstants.DWRConfig.BROWSER_VERSION));
+        dwrsession.setPlatform((String) scriptSession.getAttribute(ImConstants.DWRConfig.BROWSER));
+        dwrsession.setPlatformVersion((String) scriptSession.getAttribute(ImConstants.DWRConfig.BROWSER_VERSION));
         dwrsession.setBindTime(System.currentTimeMillis());
         dwrsession.setUpdateTime(System.currentTimeMillis());
         Session session = sessions.get(sessionid);
         if (session != null) {
             log.info("session " + sessionid + " exist!");
-            if(session.getSource()!=ImConstants.ImserverConfig.DWR){
+            if (session.getSource() != ImConstants.ImserverConfig.DWR) {
                 //从广播组清除
-                log.info("sessionId ----" + session.getAccount() +" start remove !");
+                log.info("sessionId ----" + session.getAccount() + " start remove !");
                 ImChannelGroup.remove(session.getSession());
                 List<Channel> channels = session.getSessionAll();
-                if(channels!=null&&channels.size()>0){
-                    for(Channel cl:channels){
+                if (channels != null && channels.size() > 0) {
+                    for (Channel cl : channels) {
                         ImChannelGroup.remove(cl);
                     }
                 }
                 //session.close();
                 sessions.remove(session.getAccount());
                 log.info("session " + sessionid + " have been closed!");
-            }else if(session.getSource()==ImConstants.ImserverConfig.DWR){
+            } else if (session.getSource() == ImConstants.ImserverConfig.DWR) {
                 session.addSessions(dwrsession);
                 updateSession(session);
                 log.info("session " + sessionid + " update!");
@@ -203,14 +203,15 @@ public class SessionMangerImpl implements SessionManger {
 
     /**
      * 设置session内容
+     *
      * @param ctx
      * @param wrapper
      * @param sessionId
      * @return
      */
-    private Session  setSessionContent(ChannelHandlerContext ctx,MessageWrapper wrapper,String sessionId){
+    private Session setSessionContent(ChannelHandlerContext ctx, MessageWrapper wrapper, String sessionId) {
         log.info("create new session " + sessionId + ", ctx -> " + ctx.toString());
-        MessageProto.Model model = (MessageProto.Model)wrapper.getBody();
+        MessageProto.Model model = (MessageProto.Model) wrapper.getBody();
         Session session = new Session(ctx.channel());
         session.setAccount(sessionId);
         session.setSource(wrapper.getSource());

@@ -8,10 +8,14 @@ import com.pit.im.server.model.MessageWrapper;
 import com.pit.im.server.model.Session;
 import com.pit.im.server.model.session.SessionManger;
 import com.pit.im.server.proxy.MessageProxy;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * @author deng
@@ -97,31 +101,79 @@ public class ImConnectorImpl implements ImConnector {
 
     @Override
     public void close(ChannelHandlerContext hander, MessageWrapper wrapper) {
-
+        String sessionId = getChannelSessionId(hander);
+        if (StringUtils.isNotBlank(sessionId)) {
+            close(hander);
+            log.warn("connector close channel sessionId -> " + sessionId + ", ctx -> " + hander.toString());
+        }
     }
 
     @Override
     public void close(String sessionId) {
-
+        try {
+            Session session = sessionManger.getSession(sessionId);
+            if (session != null) {
+                sessionManger.removeSession(sessionId);
+                List<Channel> list = session.getSessionAll();
+                for(Channel ch:list){
+                    ImChannelGroup.remove(ch);
+                }
+                log.info("connector close sessionId -> " + sessionId + " success " );
+            }
+        } catch (Exception e) {
+            log.error("connector close sessionId -->"+sessionId+"  Exception.", e);
+            throw new RuntimeException(e.getCause());
+        }
     }
 
     @Override
     public void close(ChannelHandlerContext hander) {
-
+        String sessionId = getChannelSessionId(hander);
+        try {
+            String nid = hander.channel().id().asShortText();
+            Session session = sessionManger.getSession(sessionId);
+            if (session != null) {
+                sessionManger.removeSession(sessionId,nid);
+                ImChannelGroup.remove(hander.channel());
+                log.info("connector close sessionId -> " + sessionId + " success " );
+            }
+        } catch (Exception e) {
+            log.error("connector close sessionId -->"+sessionId+"  Exception.", e);
+            throw new RuntimeException(e.getCause());
+        }
     }
 
     @Override
     public void connect(ChannelHandlerContext ctx, MessageWrapper wrapper) {
-
+        try {
+            String sessionId = wrapper.getSessionId();
+            String sessionId0 = getChannelSessionId(ctx);
+            //当sessionID存在或者相等  视为同一用户重新连接
+            if (StringUtils.isNotEmpty(sessionId0) || sessionId.equals(sessionId0)) {
+                log.info("connector reconnect sessionId -> " + sessionId + ", ctx -> " + ctx.toString());
+                pushMessage(messageProxy.getReConnectionStateMsg(sessionId0));
+            } else {
+                log.info("connector connect sessionId -> " + sessionId + ", sessionId0 -> " + sessionId0 + ", ctx -> " + ctx.toString());
+                sessionManger.createSession(wrapper, ctx);
+                setChannelSessionId(ctx, sessionId);
+                log.info("create channel attr sessionId " + sessionId + " successful, ctx -> " + ctx.toString());
+            }
+        } catch (Exception e) {
+            log.error("connector connect  Exception.", e);
+        }
     }
 
     @Override
     public boolean exist(String sessionId) throws Exception {
-        return false;
+        return sessionManger.exist(sessionId);
     }
 
     @Override
     public String getChannelSessionId(ChannelHandlerContext ctx) {
-        return null;
+        return ctx.channel().attr(ImConstants.SessionConfig.SERVER_SESSION_ID).get();
     }
+    private void setChannelSessionId(ChannelHandlerContext ctx, String sessionId) {
+        ctx.channel().attr(ImConstants.SessionConfig.SERVER_SESSION_ID).set(sessionId);
+    }
+
 }
