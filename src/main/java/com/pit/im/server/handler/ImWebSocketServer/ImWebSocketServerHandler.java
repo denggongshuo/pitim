@@ -78,6 +78,7 @@ public class ImWebSocketServerHandler extends SimpleChannelInboundHandler<Messag
             log.error("ImWebSocketServerHandler channerRead error.", e);
             throw e;
         }
+
     }
 
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
