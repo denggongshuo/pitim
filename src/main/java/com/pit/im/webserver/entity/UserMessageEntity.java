@@ -1,5 +1,6 @@
 package com.pit.im.webserver.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
@@ -11,6 +12,7 @@ import java.util.Date;
  * @date 2020/1/2 16:49
  */
 @Data
+@TableName("user_message")
 public class UserMessageEntity implements Serializable {
 
     private static final long serialVersionUID = 6129241549286284033L;

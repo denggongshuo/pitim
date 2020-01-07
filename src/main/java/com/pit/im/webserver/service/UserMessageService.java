@@ -1,5 +1,6 @@
 package com.pit.im.webserver.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.pit.im.webserver.entity.UserMessageEntity;
 
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.Map;
  * @author deng
  * @date 2020/1/2 16:47
  */
-public interface UserMessageService {
+public interface UserMessageService extends IService<UserMessageEntity> {
 
     UserMessageEntity getInfo(String userId);
 
@@ -17,7 +18,7 @@ public interface UserMessageService {
 
     int queryTotal(Map<String, Object> map);
 
-    void save(UserMessageEntity userMessage);
+    boolean save(UserMessageEntity userMessage);
 
     int update(UserMessageEntity userMessage);
 

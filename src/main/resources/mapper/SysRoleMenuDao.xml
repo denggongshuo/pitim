@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pit.im.webserver.dao.SysRoleMenuDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.pit.im.webserver.entity.SysRoleMenuEntity" id="sysRoleMenuMap">
+        <result property="roleId" column="role_id"/>
+        <result property="menuId" column="menu_id"/>
+    </resultMap>
+
+    <select id="getPermsByUserId" resultType="java.lang.String">
+        SELECT DISTINCT
+            t2.perms
+        FROM
+            sys_role_menu t1
+        LEFT JOIN sys_menu t2 ON t1.menu_id = t2.menu_id
+        LEFT JOIN sys_user_role t3 ON t1.role_id = t3.role_id
+        LEFT JOIN sys_user t4 ON t3.user_id = t4.user_id
+        WHERE t4.user_id = 2 AND t2.perms != '' AND t2.perms IS NOT NULL
+    </select>
+
+
+</mapper>

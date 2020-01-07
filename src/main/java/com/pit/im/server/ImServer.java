@@ -17,10 +17,13 @@ import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.InitBinder;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -29,12 +32,12 @@ import javax.annotation.PreDestroy;
  * @author deng
  * @date 2019/12/31 13:35
  */
-@Slf4j
-//@Component
 public class ImServer {
+    private final static Logger log = LoggerFactory.getLogger(ImServer.class);
 
-    @Value("${im.server.port}")
+
     private int port;
+
 
     private ProtobufDecoder decoder = new ProtobufDecoder(MessageProto.Model.getDefaultInstance());
     private ProtobufEncoder encoder = new ProtobufEncoder();
@@ -64,7 +67,7 @@ public class ImServer {
                 pipeline.addLast("frameEncoder", new ProtobufVarint32LengthFieldPrepender());
                 pipeline.addLast("encoder", encoder);
                 pipeline.addLast(new IdleStateHandler(ImConstants.ImserverConfig.READ_IDLE_TIME, ImConstants.ImserverConfig.WRITE_IDLE_TIME, 0));
-                pipeline.addLast("handler", new ImServerHandler(messageProxy,connector));
+                pipeline.addLast("handler", new ImServerHandler(messageProxy, connector));
             }
         });
         // 可选参数
@@ -85,7 +88,6 @@ public class ImServer {
     }
 
 
-    @PreDestroy
     public void destroy() {
         log.info("destroy ImServer ...");
         // 释放线程池资源
@@ -97,5 +99,15 @@ public class ImServer {
         log.info("destroy ImServer complate.");
     }
 
+    public void setPort(int port) {
+        this.port = port;
+    }
 
+    public void setMessageProxy(MessageProxy messageProxy) {
+        this.messageProxy = messageProxy;
+    }
+
+    public void setConnector(ImConnector connector) {
+        this.connector = connector;
+    }
 }
