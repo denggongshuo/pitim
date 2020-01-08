@@ -28,7 +28,13 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/webjars/**",
                 "/userlogin",
                 "/userlogout",
-                "/getUserExt"
+                "/getUserExt",
+                "/dist/**",
+                "/vendor/**",
+                "/index.html",
+                "/123.html",
+                "/register.html",
+                "/reset-password.html"
 
         );
     }

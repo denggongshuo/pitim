@@ -1,12 +1,15 @@
 package com.pit.im.webserver.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.api.R;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pit.im.utils.BCryptUtil;
 import com.pit.im.utils.BaseController;
 import com.pit.im.webserver.entity.SysUserEntity;
 import com.pit.im.webserver.entity.ext.UserExt;
 import com.pit.im.webserver.service.SysUserService;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.coyote.OutputBuffer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,10 +39,15 @@ public class SysUserServiceController extends BaseController {
     }
 
     @GetMapping("/getUserExt")
-    public R getUserExt(String loginName){
-       UserExt userExt = userService.getUserExt(loginName);
-       return R.ok(userExt);
+    public R getUserExt(String loginName) {
+        UserExt userExt = userService.getUserExt(loginName);
+        return R.ok(userExt);
     }
 
+    @GetMapping("/page")
+    public R page() {
+        IPage page = userService.getPage();
+        return R.ok(page);
+    }
 
 }

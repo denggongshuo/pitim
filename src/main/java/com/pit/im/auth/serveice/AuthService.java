@@ -50,6 +50,9 @@ public class AuthService {
     @Value("${server.port}")
     private String port;
 
+    @Value("${server.servlet.context-path}")
+    private String context_path;
+
     @Autowired
     StringRedisTemplate stringRedisTemplate;
 
@@ -108,6 +111,11 @@ public class AuthService {
         return expire > 0;
     }
 
+    public String getJwtToken(String access_token) {
+        String key = ACCESS_TOKEN + ":" + access_token;
+        return stringRedisTemplate.opsForValue().get(key);
+    }
+
     //删除token
     public boolean delToken(String access_token) {
 
@@ -122,8 +130,9 @@ public class AuthService {
     //申请令牌
     private AuthToken applyToken(String username, String password, String clientId, String clientSecret) {
 
-        //令牌申请的地址 http://localhost:port/auth/oauth/token
-        String authUrl = "http://localhost:" + port + "/oauth/token";
+        String path = context_path.equals("/") ? "" : context_path;
+        //令牌申请的地址 http://localhost:port/context-path/auth/oauth/token
+        String authUrl = "http://localhost:" + port + path + "/oauth/token";
         //定义header
         LinkedMultiValueMap<String, String> header = new LinkedMultiValueMap<>();
         String httpBasic = getHttpBasic(clientId, clientSecret);

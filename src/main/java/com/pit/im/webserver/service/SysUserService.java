@@ -1,5 +1,7 @@
 package com.pit.im.webserver.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.pit.im.webserver.entity.SysUserEntity;
 import com.pit.im.webserver.entity.ext.UserExt;
@@ -21,5 +23,8 @@ public interface SysUserService extends IService<SysUserEntity> {
      * @return
      */
     UserExt getUserExt(String loginName);
+
+    IPage getPage();
+
 }
 
